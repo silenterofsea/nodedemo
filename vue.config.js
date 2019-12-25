@@ -87,8 +87,9 @@ module.exports = {
     host: "0.0.0.0",
     port: "8080",
     hot: true,
+    hotOnly: false,
     /* 自动打开浏览器 */
-    open: false,
+    open: true,
     overlay: {
       warning: false,
       error: true
