@@ -16,12 +16,12 @@
         
         <el-form-item  prop="password" class="item-form">
             <label>密码</label>
-            <el-input type="password" v-model="ruleForm.password" autocomplete="off" :minlength="6" :maxlength="20"></el-input>
+            <el-input type="password" v-model="ruleForm.password" autocomplete="off" minlength="6" maxlength="20"></el-input>
         </el-form-item>
 
         <el-form-item  prop="passwords" class="item-form" v-if="model === 'register'">
             <label>重复密码</label>
-            <el-input type="password" v-model="ruleForm.passwords" autocomplete="off" :minlength='6' :maxlength='20'></el-input>
+            <el-input type="password" v-model="ruleForm.passwords" autocomplete="off" minlength="6" maxlength="20"></el-input>
         </el-form-item>
         
         
@@ -30,7 +30,7 @@
 
             <el-row :gutter="10">
             <el-col :span="15">
-                <el-input v-model.number="ruleForm.code" :minlength='6' :maxlength='6'></el-input>
+                <el-input v-model.number="ruleForm.code" minlength="6" maxlength="6"></el-input>
             </el-col>
             <el-col :span="9">
                 <el-button type="success" class="block">获取验证码</el-button>
@@ -52,12 +52,11 @@
 </div>
 </template>
 <script>
-import { reactive, ref, onMounted } from '@vue/composition-api';
 import { stripscript, validataUsername, validataCode, validataPassword } from '@u/validata';
-
 export default {
     name: 'login',
-    setup(props, context){
+    data(){
+
         var validateCode = (rule, value, callback) => {
         
         if (value === '') {
@@ -92,32 +91,26 @@ export default {
 
       var validatePasswords = (rule, value, callback) => {
         console.log(stripscript(value));
-        if(model.value === 'login'){
+        if(this.ruleForm.model === 'login'){
            callback(); 
         };
         if (value === '') {
           callback(new Error('请再次输入密码'));
-        }  else if(ruleForm.password != value){
+        }  else if(this.ruleForm.password != value){
             callback(new Error('两次输入的密码必须相同'))
         }
         else{
           callback();
         }
       };
-        //这里面方式data数据、生命周期、自定义函数
-        const menuTab = reactive([
-                { txt: "登录", current: true, type: 'login' },
-                { txt: "注册", current: false, type: 'register'}
-            ]);
-        const  model =ref('login');
-        
-        const ruleForm = reactive({
+      return {
+        ruleForm: {
           username: '',
           password: '',
           passwords: '',
           code: ''
-        });
-        const rules = reactive({
+        },
+        rules: {
           username: [
             { validator: validateUsername, trigger: 'blur' }
           ],
@@ -130,52 +123,12 @@ export default {
           code: [
             { validator: validateCode, trigger: 'blur' }
           ]
-        });
-        /*
-        自定义函数
-        */
-        const toggleMenu = (data=>{
-            console.log(data)
-            menuTab.forEach(elem=>{
-                elem.current = false
-            });
-            data.current = true;
-            model.value = data.type;
-        });
-        const submitForm = (formName=> {
-        context.refs[formName].validate((valid) => {
-          if (valid) {
-            alert('submit!');
-          } else {
-            console.log('error submit!!');
-            return false;
-          }
-        });
-        });
-        
-        /*
-        生命周期
-        */
-        //挂载完成后
-        onMounted(()=>{
-
-        });
-        return {
-            menuTab,
-            model,
-            ruleForm,
-            rules,
-            toggleMenu,
-            submitForm
-        }
-    },
-    data(){
-
-        
-      return {
-        
-        
-       
+        },
+        menuTab:[
+                { txt: "登录", current: true, type: 'login' },
+                { txt: "注册", current: false, type: 'register'}
+            ],
+        model : 'login'
       };
 
         // return{
@@ -186,8 +139,29 @@ export default {
         //     isActive: true 
         // }
     },
-    
- 
+    created(){},
+    mounted(){},
+    methods:{
+        // vue 数据驱动视图的渲染
+        toggleMenu(data){
+            // console.log(data)
+            this.menuTab.forEach(elem=>{
+                elem.current = false
+            });
+            data.current = true;
+            this.model = data.type;
+        },
+        submitForm(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            alert('submit!');
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+      }
+    }
 
 }
 </script>
