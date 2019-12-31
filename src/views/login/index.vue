@@ -52,13 +52,14 @@
 </div>
 </template>
 <script>
+import service from '@u/requests';
 import { reactive, ref, onMounted } from '@vue/composition-api';
 import { stripscript, validataUsername, validataCode, validataPassword } from '@u/validata';
 
 export default {
     name: 'login',
     setup(props, context){
-        var validateCode = (rule, value, callback) => {
+        let validateCode = (rule, value, callback) => {
         
         if (value === '') {
             return callback(new Error('请输入验证码'));
@@ -69,7 +70,7 @@ export default {
         }
         
       };
-      var validateUsername = (rule, value, callback) => {
+      let validateUsername = (rule, value, callback) => {
         if (value === '') {
           callback(new Error('请输入登录名：邮箱'));
         } else if(validataUsername(value)){
@@ -78,7 +79,7 @@ export default {
           callback();
         }
       };
-      var validatePassword = (rule, value, callback) => {
+      let validatePassword = (rule, value, callback) => {
         console.log(stripscript(value));
         
         if (value === '') {
@@ -90,7 +91,7 @@ export default {
         }
       };
 
-      var validatePasswords = (rule, value, callback) => {
+      let validatePasswords = (rule, value, callback) => {
         console.log(stripscript(value));
         if(model.value === 'login'){
            callback(); 
