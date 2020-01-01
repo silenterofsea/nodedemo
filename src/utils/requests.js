@@ -2,9 +2,12 @@
 拦截器
 */
 import axios from 'axios';
-
-
-var service = axios.create();
+const BASEURL = process.env.NODE_ENV === 'production' ? '' : '/api';
+// 'http://www.web-jshtml.cn/productapi'
+var service = axios.create({
+  baseURL: BASEURL,
+  timeout: 1000
+});
 // 添加请求拦截器
 service.interceptors.request.use(function (config) {
     // 在发送请求之前做些什么

@@ -33,7 +33,7 @@
                 <el-input v-model.number="ruleForm.code" :minlength='6' :maxlength='6'></el-input>
             </el-col>
             <el-col :span="9">
-                <el-button type="success" class="block">获取验证码</el-button>
+                <el-button type="success" class="block" @click="getSms()">获取验证码</el-button>
                 </el-col>
             </el-row>
 
@@ -52,6 +52,7 @@
 </div>
 </template>
 <script>
+import { GetSms } from '@/api/login';
 import service from '@u/requests';
 import { reactive, ref, onMounted } from '@vue/composition-api';
 import { stripscript, validataUsername, validataCode, validataPassword } from '@u/validata';
@@ -143,6 +144,13 @@ export default {
             data.current = true;
             model.value = data.type;
         });
+        const getSms = (()=>{
+          //alert('1111');
+          let data = {
+            username: ruleForm.username
+          };
+          GetSms(data);
+        });
         const submitForm = (formName=> {
         context.refs[formName].validate((valid) => {
           if (valid) {
@@ -167,6 +175,7 @@ export default {
             ruleForm,
             rules,
             toggleMenu,
+            getSms,
             submitForm
         }
     },

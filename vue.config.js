@@ -95,6 +95,14 @@ module.exports = {
       error: true
     },
     /* 跨域代理 */
-    proxy: null
+    proxy: {
+      '/api':{
+        target:"http://www.web-jshtml.cn/productapi",
+        changeOrigin: true,
+        pathRewrite:{
+          '^/api':''
+        }
+      }
+    }
   }
 };
