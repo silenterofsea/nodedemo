@@ -9,24 +9,24 @@
         <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm"  class="login-form" size="middle">
         
         <el-form-item  prop="username" class="item-form">
-            <label>邮箱</label>
-            <el-input type="text" v-model="ruleForm.username" autocomplete="off"></el-input>
+            <label for="username">邮箱</label>
+            <el-input id="username" type="text" v-model="ruleForm.username" autocomplete="off"></el-input>
         </el-form-item>
        
         
         <el-form-item  prop="password" class="item-form">
-            <label>密码</label>
-            <el-input type="password" v-model="ruleForm.password" autocomplete="off" :minlength="6" :maxlength="20"></el-input>
+            <label for="password">密码</label>
+            <el-input id="password" type="password" v-model="ruleForm.password" autocomplete="off" :minlength="6" :maxlength="20"></el-input>
         </el-form-item>
 
         <el-form-item  prop="passwords" class="item-form" v-if="model === 'register'">
-            <label>重复密码</label>
-            <el-input type="password" v-model="ruleForm.passwords" autocomplete="off" :minlength='6' :maxlength='20'></el-input>
+            <label for="repeatpassword">重复密码</label>
+            <el-input id="repeatpassword" type="password" v-model="ruleForm.passwords" autocomplete="off" :minlength='6' :maxlength='20'></el-input>
         </el-form-item>
         
         
         <el-form-item  prop="code" class="item-form">
-            <label>验证码</label>
+            <label >验证码</label>
 
             <el-row :gutter="10">
             <el-col :span="15">
@@ -43,7 +43,7 @@
         </el-form-item>
         
         <el-form-item>
-            <el-button type="danger" @click="submitForm('ruleForm')" class="login-btn block">提交</el-button>
+            <el-button type="danger" @click="submitForm('ruleForm')" :disabled="loginButtonStatus" class="login-btn block">{{ model === 'login' ? "登录" : "注册" }}</el-button>
         </el-form-item>
         </el-form>
 
@@ -59,7 +59,8 @@ import { stripscript, validataUsername, validataCode, validataPassword } from '@
 
 export default {
     name: 'login',
-    setup(props, context){
+    //setup(props, context){
+      setup(props, { refs, root }){
         let validateCode = (rule, value, callback) => {
         
         if (value === '') {
@@ -112,7 +113,7 @@ export default {
                 { txt: "注册", current: false, type: 'register'}
             ]);
         const  model =ref('login');
-        
+        const loginButtonStatus = ref(true);
         const ruleForm = reactive({
           username: '',
           password: '',
@@ -145,14 +146,27 @@ export default {
             model.value = data.type;
         });
         const getSms = (()=>{
-          //alert('1111');
-          let data = {
-            username: ruleForm.username
+          if(ruleForm.username == ''){
+            root.$message.error("邮箱不能为空，邮箱都没有往哪里发邮件？？？？");
+            return false;
           };
-          GetSms(data);
+          if(validataUsername(ruleForm.username)){
+            root.$message.error("邮箱格式有误，请核实后再输入");
+            return false;
+          };
+          //alert('1111');
+          let requestData = {
+            username: ruleForm.username,
+            module: 'login'
+          };
+          GetSms(requestData).then(response => {
+            console.log(response);
+          }).catch(error => {
+            console.log(error);
+          });
         });
         const submitForm = (formName=> {
-        context.refs[formName].validate((valid) => {
+        refs[formName].validate((valid) => {
           if (valid) {
             alert('submit!');
           } else {
@@ -173,6 +187,7 @@ export default {
             menuTab,
             model,
             ruleForm,
+            loginButtonStatus,
             rules,
             toggleMenu,
             getSms,
