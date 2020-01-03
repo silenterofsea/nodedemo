@@ -33,7 +33,7 @@
                 <el-input v-model.number="ruleForm.code" :minlength='6' :maxlength='6'></el-input>
             </el-col>
             <el-col :span="9">
-                <el-button type="success" class="block" @click="getSms()">获取验证码</el-button>
+                <el-button type="success" class="block" @click="getSms()" :disabled="codeButtonStatus.status">{{ codeButtonStatus.text }}</el-button>
                 </el-col>
             </el-row>
 
@@ -113,7 +113,16 @@ export default {
                 { txt: "注册", current: false, type: 'register'}
             ]);
         const  model =ref('login');
+        const timer = ref(null);
         const loginButtonStatus = ref(true);
+        // const codeButtonStatus = ref(false);
+        // const codeButtonText = ref("获取验证码");
+        const codeButtonStatus = reactive(
+          {
+            status: false,
+            text: "获取验证码"
+          }
+        );
         const ruleForm = reactive({
           username: '',
           password: '',
@@ -144,6 +153,8 @@ export default {
             });
             data.current = true;
             model.value = data.type;
+            //refs['ruleForm'].resetFeilds();
+            refs.ruleForm.resetFields();
         });
         const getSms = (()=>{
           if(ruleForm.username == ''){
@@ -157,13 +168,31 @@ export default {
           //alert('1111');
           let requestData = {
             username: ruleForm.username,
-            module: 'login'
+            module: model.value
           };
-          GetSms(requestData).then(response => {
-            console.log(response);
-          }).catch(error => {
-            console.log(error);
-          });
+          // codeButtonStatus.value = true;
+          // codeButtonText.value = "发送中";
+          codeButtonStatus.status = true;
+          codeButtonStatus.text = "发送中";
+          setTimeout(() => {
+            GetSms(requestData).then(response => {
+              //console.log(response);
+              let data = response.data;
+              root.$message({
+                message: data.message,
+                type: 'success'
+              });
+              countDown(60);
+              // codeButtonText.value = "发送验证码";
+              // codeButtonStatus.value = false;
+              loginButtonStatus.value = false;
+            }).catch(error => {
+              console.log(error);
+            });  
+          }, 3000);
+          
+
+
         });
         const submitForm = (formName=> {
         refs[formName].validate((valid) => {
@@ -174,6 +203,20 @@ export default {
             return false;
           }
         });
+        });
+
+        const countDown = ((number) =>{
+          // setTimeout 执行一次
+          // setInterval 不断执行，需要条件才会停止
+          let time = number;
+          timer.value = setInterval(()=>{
+            time --;
+            console.log(time);
+            if(time === 0){
+              clearInterval(timer.value);
+            }
+            codeButtonStatus.text = `${time}秒后再次发送`
+          }, 1000);
         });
         
         /*
@@ -188,32 +231,13 @@ export default {
             model,
             ruleForm,
             loginButtonStatus,
+            codeButtonStatus,
             rules,
             toggleMenu,
             getSms,
             submitForm
         }
     },
-    data(){
-
-        
-      return {
-        
-        
-       
-      };
-
-        // return{
-        //     menuTab:[
-        //         { txt: "登录", current: true },
-        //         { txt: "注册", current: false }
-        //     ],
-        //     isActive: true 
-        // }
-    },
-    
- 
-
 }
 </script>
 <style lang="scss" scoped>

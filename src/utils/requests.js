@@ -7,7 +7,7 @@ const BASEURL = process.env.NODE_ENV === 'production' ? '' : '/api';
 // 'http://www.web-jshtml.cn/productapi'
 var service = axios.create({
   baseURL: BASEURL,
-  timeout: 1000
+  timeout: 15000
 });
 // 添加请求拦截器
 service.interceptors.request.use(function (config) {
