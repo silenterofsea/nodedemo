@@ -52,7 +52,7 @@
 </div>
 </template>
 <script>
-import { GetSms } from '@/api/login';
+import { GetSms, Register } from '@/api/login';
 import service from '@u/requests';
 import { reactive, ref, onMounted } from '@vue/composition-api';
 import { stripscript, validataUsername, validataCode, validataPassword } from '@u/validata';
@@ -198,6 +198,22 @@ export default {
         refs[formName].validate((valid) => {
           if (valid) {
             alert('submit!');
+            let responseData = {
+              username: ruleForm.username,
+              password: ruleForm.password,
+              code: ruleForm.code,
+              model: 'register'
+            };
+            Register(responseData).then(response=>{
+              console.log(response);
+              let data = response.data;
+              root.$message({
+                message: data.message,
+                type: 'success'
+              });
+            }).catch(error=>{
+
+            });
           } else {
             console.log('error submit!!');
             return false;
@@ -214,8 +230,11 @@ export default {
             console.log(time);
             if(time === 0){
               clearInterval(timer.value);
+              codeButtonStatus.status = false;
+              codeButtonStatus.text = "再次获取";
+            }else{
+              codeButtonStatus.text = `${time}秒后再次发送`
             }
-            codeButtonStatus.text = `${time}秒后再次发送`
           }, 1000);
         });
         

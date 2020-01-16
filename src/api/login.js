@@ -8,3 +8,11 @@ export function GetSms(data){
         data: data
     });
 };
+
+export function Register(data){
+    return service.request({
+        method: "post",
+        url: "/register/",
+        data: data
+    });
+};
